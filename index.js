@@ -19,10 +19,26 @@ async function run(){
     try{
             const categoriesCollection = client.db('denGadget').collection('categoriesList');
 
+            const sections = client.db('denGadget').collection('section');
+
             app.get('/categoriesList', async(req, res) =>{
                 const query = {};
                 const categories = await categoriesCollection.find(query).toArray();
                 res.send(categories);
+            })
+            
+
+
+
+
+
+
+
+            //section informations
+            app.get('/sections', async(req, res) =>{
+                const query = {};
+                const section = await sections.find(query).toArray();
+                res.send(section);
             })
     }
     finally{
