@@ -20,13 +20,24 @@ async function run(){
             const categoriesCollection = client.db('denGadget').collection('categoriesList');
 
             const sections = client.db('denGadget').collection('section');
+            const productsCollection = client.db('denGadget').collection('productsList');
 
             app.get('/categoriesList', async(req, res) =>{
                 const query = {};
                 const categories = await categoriesCollection.find(query).toArray();
                 res.send(categories);
             })
-            
+            app.get('/products', async(req, res) =>{
+                const query = {};
+                const products = await productsCollection.find(query).toArray();
+                res.send(products);
+            })
+            app.get('/products/:categoryId', async(req,res) =>{
+                const id = req.params.categoryId;
+                const query = {categoryId: id};
+                const products = await productsCollection.find(query).toArray();
+                res.send(products);
+            })
 
 
 
