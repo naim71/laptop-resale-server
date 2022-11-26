@@ -16,12 +16,16 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 async function run(){
-    try{
+    try{    //collections
             const categoriesCollection = client.db('denGadget').collection('categoriesList');
 
             const sections = client.db('denGadget').collection('section');
             const productsCollection = client.db('denGadget').collection('productsList');
+            const bookingsCollection = client.db('denGadget').collection('bookings');
 
+
+
+            //CRUD operations
             app.get('/categoriesList', async(req, res) =>{
                 const query = {};
                 const categories = await categoriesCollection.find(query).toArray();
@@ -39,6 +43,13 @@ async function run(){
                 res.send(products);
             })
 
+            app.post('/bookings', async(req,res)=>{
+                const booking = req.body;
+                console.log(booking);
+                const result = await bookingsCollection.insertOne(booking);
+                res.send(result);
+
+            })
 
 
 
