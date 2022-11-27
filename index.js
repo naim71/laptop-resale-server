@@ -23,6 +23,8 @@ async function run(){
             const productsCollection = client.db('denGadget').collection('productsList');
             const bookingsCollection = client.db('denGadget').collection('bookings');
 
+            const usersCollection = client.db('denGadget').collection('users');
+
 
 
             //CRUD operations
@@ -47,6 +49,13 @@ async function run(){
                 const booking = req.body;
                 console.log(booking);
                 const result = await bookingsCollection.insertOne(booking);
+                res.send(result);
+
+            })
+
+            app.post('/users', async(req,res)=>{
+                const user = req.body;
+                const result = await usersCollection.insertOne(user);
                 res.send(result);
 
             })
