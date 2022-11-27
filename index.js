@@ -61,9 +61,9 @@ async function run(){
             })
             app.get('/users', async(req, res) =>{
                 let query = {};
-                if (req.query.role) {
+                if (req.query.email) {
                     query = {
-                        role: req.query.role
+                        email: req.query.email
                     }
                 }
                 const result = await usersCollection.find(query).toArray();
