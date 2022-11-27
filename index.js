@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
@@ -16,11 +17,12 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 async function run(){
-    try{    //collections
+    try{    //db collections
             const categoriesCollection = client.db('denGadget').collection('categoriesList');
 
             const sections = client.db('denGadget').collection('section');
             const productsCollection = client.db('denGadget').collection('productsList');
+
             const bookingsCollection = client.db('denGadget').collection('bookings');
 
             const usersCollection = client.db('denGadget').collection('users');
@@ -68,6 +70,19 @@ async function run(){
                 }
                 const result = await usersCollection.find(query).toArray();
                 res.send(result);
+            })
+
+            //jwt token
+            app.get('/jwt', async(req, res) =>{
+                const email = req.query.email;
+                const query = {email: email}
+                const user = await usersCollection.findOne(query);
+                if(user){
+                    const token = jwt.sign({email}, process.env.ACCESS_TOKEN, {expiresIn: '10h'})
+                    return res.send({accessToken: token})
+                }
+                console.log(user);
+                res.status(403).send({accessToken: ''})
             })
 
           
