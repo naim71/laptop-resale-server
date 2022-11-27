@@ -59,7 +59,19 @@ async function run(){
                 res.send(result);
 
             })
+            app.get('/users', async(req, res) =>{
+                let query = {};
+                if (req.query.role) {
+                    query = {
+                        role: req.query.role
+                    }
+                }
+                const result = await usersCollection.find(query).toArray();
+                res.send(result);
+            })
 
+          
+    
 
 
 
