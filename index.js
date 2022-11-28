@@ -56,24 +56,37 @@ async function run(){
                 const categories = await categoriesCollection.find(query).toArray();
                 res.send(categories);
             })
+            app.get('/products', async(req, res) =>{
+                const query = {};
+                const products = await productsCollection.find(query).toArray();
+                res.send(products);
+            })
             app.post('/products', async(req,res)=>{
                 const product = req.body;
                 const result = await productsCollection.insertOne(product);
                 res.send(result);
 
             })
-            app.get('/products', async(req, res) =>{
-                const query = {};
-                const products = await productsCollection.find(query).toArray();
-                res.send(products);
+            app.get('/products/:seller', async(req, res) =>{
+                const seller = req.params.seller;
+                console.log(seller);
+                const query = {seller: seller}
+                const product = await productsCollection.find(query).toArray();
+                res.send(product);
             })
-            app.get('/products/:categoryId', async(req,res) =>{
+           
+
+
+            app.get('/products/categories/:categoryId', async(req,res) =>{
                 const id = req.params.categoryId;
+                console.log(id);
                 const query = {categoryId: id};
-                const products = await productsCollection.find(query).toArray();
-                res.send(products);
+                console.log(query);
+                const productresult = await productsCollection.find(query).toArray();
+                console.log(productresult);
+                res.send(productresult);
             })
-            //bookings uploading
+          
             app.post('/bookings', async(req,res)=>{
                 const booking = req.body;
                 console.log(booking);
