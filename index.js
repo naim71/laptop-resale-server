@@ -16,6 +16,27 @@ app.use(express.json());
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.4evolx3.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+function verifyJWT(req, res, next) {
+    console.log('token inside', req.headers.authorization);
+
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send('unauthorized access');
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({ message: 'forbidden access' })
+        }
+        req.decoded = decoded;
+        next();
+    })
+
+}
+
 async function run(){
     try{    //db collections
             const categoriesCollection = client.db('denGadget').collection('categoriesList');
@@ -46,7 +67,7 @@ async function run(){
                 const products = await productsCollection.find(query).toArray();
                 res.send(products);
             })
-
+            //bookings uploading
             app.post('/bookings', async(req,res)=>{
                 const booking = req.body;
                 console.log(booking);
@@ -54,6 +75,33 @@ async function run(){
                 res.send(result);
 
             })
+            //email query in bookings
+            app.get('/bookings', verifyJWT, async (req, res) => {
+                const email = req.query.email;
+                const decodedEmail = req.decoded.email;
+    
+                if (email !== decodedEmail) {
+                    return res.status(403).send({ message: 'forbidden access' });
+                }
+    
+                const query = { email: email };
+                const bookings = await bookingsCollection.find(query).toArray();
+                res.send(bookings);
+            });
+
+            app.get('/booking', async(req, res) =>{
+                const query = {};
+                const result = await bookingsCollection.find(query).toArray();
+                res.send(result);
+            })
+    
+            // app.get('/bookings/:id', async (req, res) => {
+            //     const id = req.params.id;
+            //     const query = { _id: ObjectId(id) };
+            //     const booking = await bookingsCollection.findOne(query);
+            //     res.send(booking);
+            // })
+    
 
             app.post('/users', async(req,res)=>{
                 const user = req.body;
@@ -68,8 +116,21 @@ async function run(){
                         email: req.query.email
                     }
                 }
+                if (req.query.role) {
+                    query = {
+                        role: req.query.role
+                    }
+                }
                 const result = await usersCollection.find(query).toArray();
                 res.send(result);
+            })
+            
+            //checking if user is admin
+            app.get('/users/admin/:email', async (req, res) => {
+                const email = req.params.email;
+                const query = { email }
+                const user = await usersCollection.findOne(query);
+                res.send({ isAdmin: user?.role === 'admin' });
             })
 
             //jwt token
