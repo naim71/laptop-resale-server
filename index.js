@@ -86,7 +86,24 @@ async function run() {
             const result = await productsCollection.update(filter, updatedDoc, options);
             res.send(result);
         })
-
+        app.put('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    advertised: 'true'
+                }
+            }
+            const result = await productsCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        })
+        app.delete('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await productsCollection.deleteOne(filter);
+            res.send(result);
+        })
 
 
         app.get('/products/categories/:categoryId', async (req, res) => {
@@ -171,6 +188,17 @@ async function run() {
         //     const user = await usersCollection.findOne(query);
         //     res.send(user);
         // })
+
+        //delete seller
+        app.delete('/users/seller/:email', async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const result = await usersCollection.deleteOne(filter);
+            res.send(result);
+        })
+
+
+
         app.put('/users/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) }
@@ -197,6 +225,21 @@ async function run() {
             const user = await usersCollection.findOne(query);
             res.send({ isBuyer: user?.role === 'Buyer' });
         })
+        app.get('/user/buyer/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {  _id: ObjectId(id) }
+            const result = await usersCollection.findOne(query);
+            res.send(result);
+        })
+
+        //delete buyer
+        app.delete('/user/buyer/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = {  _id: ObjectId(id) }
+            const result = await usersCollection.deleteOne(filter);
+            res.send(result);
+        })
+
 
         //jwt token
         app.get('/jwt', async (req, res) => {
