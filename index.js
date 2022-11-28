@@ -56,6 +56,12 @@ async function run(){
                 const categories = await categoriesCollection.find(query).toArray();
                 res.send(categories);
             })
+            app.post('/products', async(req,res)=>{
+                const product = req.body;
+                const result = await productsCollection.insertOne(product);
+                res.send(result);
+
+            })
             app.get('/products', async(req, res) =>{
                 const query = {};
                 const products = await productsCollection.find(query).toArray();
@@ -131,6 +137,20 @@ async function run(){
                 const query = { email }
                 const user = await usersCollection.findOne(query);
                 res.send({ isAdmin: user?.role === 'admin' });
+            })
+            //checking if user is seller
+            app.get('/users/seller/:email', async (req, res) => {
+                const email = req.params.email;
+                const query = { email }
+                const user = await usersCollection.findOne(query);
+                res.send({ isSeller: user?.role === 'Seller' });
+            })
+            //checking if user is buyer
+            app.get('/users/buyer/:email', async (req, res) => {
+                const email = req.params.email;
+                const query = { email }
+                const user = await usersCollection.findOne(query);
+                res.send({ isBuyer: user?.role === 'Buyer' });
             })
 
             //jwt token
